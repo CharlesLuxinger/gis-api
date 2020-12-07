@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+    mongodb.gis.api:
+        container_name: mongodb.gis.api
+        image: mongo:4.4.2
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodb:/data/db/
+
+volumes:
+    mongodb:
