@@ -1,0 +1,19 @@
+server:
+    port: 9000
+    compression:
+        enabled: true
+        mime-types: application/json
+    servlet:
+        context-path: /api/v1/
+spring:
+    profiles:
+        active: ${APP_ENV}
+    application:
+        name: gis-api
+    data:
+        mongodb:
+            uri: ${GIS_API_DB_URI}
+            database: ${GIS_API_DB_DATABASE}
+    main.banner-mode: off
+
+logging.pattern.console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %magenta([%t]) %m%n"
