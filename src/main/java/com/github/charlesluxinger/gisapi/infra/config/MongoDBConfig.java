@@ -1,6 +1,6 @@
 package com.github.charlesluxinger.gisapi.infra.config;
 
-import com.github.charlesluxinger.gisapi.infra.domain.model.CoordinateType;
+import com.github.charlesluxinger.gisapi.domain.model.CoordinateType;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;

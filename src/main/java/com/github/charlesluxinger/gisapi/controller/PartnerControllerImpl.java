@@ -1,9 +1,9 @@
 package com.github.charlesluxinger.gisapi.controller;
 
-import com.github.charlesluxinger.gisapi.controller.domain.model.ApiExceptionResponse;
+import com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse;
 import com.github.charlesluxinger.gisapi.controller.model.PartnerPayload;
 import com.github.charlesluxinger.gisapi.controller.model.PartnerResponse;
-import com.github.charlesluxinger.gisapi.service.PartnerService;
+import com.github.charlesluxinger.gisapi.domain.service.PartnerService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +37,7 @@ public class PartnerControllerImpl implements PartnerController {
     public Mono<ResponseEntity> findById(@PathVariable final String id){
         return service
                 .findById(id)
-                .map(p -> ResponseEntity.ok(null))
+                .map(p -> ResponseEntity.ok(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
                 .defaultIfEmpty(ResponseEntity
                                 .status(HttpStatus.NOT_FOUND)
@@ -47,7 +47,7 @@ public class PartnerControllerImpl implements PartnerController {
                                         .status(HttpStatus.NOT_FOUND.ordinal())
                                         .title(HttpStatus.NOT_FOUND.getReasonPhrase())
                                         .detail(String.format("Partner #%s Not Found", id))
-                                        .path("api/v1/partner/{id}")
+                                        .path(String.format("api/v1/partner/%s", id))
                                         .build()));
     }
 

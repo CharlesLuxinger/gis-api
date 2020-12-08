@@ -1,6 +1,12 @@
 package com.github.charlesluxinger.gisapi.infra.model;
 
+import com.github.charlesluxinger.gisapi.domain.model.Address;
+import com.github.charlesluxinger.gisapi.domain.model.CoverageArea;
 import com.github.charlesluxinger.gisapi.domain.model.Partner;
+import com.mongodb.client.model.geojson.MultiPolygon;
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.PolygonCoordinates;
+import com.mongodb.client.model.geojson.Position;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +19,8 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Class comments go here...
@@ -53,26 +61,46 @@ public class PartnerDocument {
     private Point address;
 
     public Partner toDomain() {
+        List<List<List<Double>>> collect = coverageArea
+                .getCoordinates()
+                .parallelStream()
+                .map(PolygonCoordinates::getExterior)
+                .collect(Collectors.toList())
+                .parallelStream()
+                .map(c -> c.parallelStream().map(Position::getValues).collect(Collectors.toList()))
+                .collect(Collectors.toList());
+
         return Partner
                 .builder()
                 .id(this.id)
                 .tradingName(this.tradingName)
                 .ownerName(this.ownerName)
                 .document(this.document)
-                .coverageArea(this.coverageArea)
-                .address(this.address)
+                .coverageArea(CoverageArea.of(collect))
+                .address(Address.of(address.getCoordinates().getValues()))
                 .build();
     }
 
     public static PartnerDocument of(final Partner partner) {
+        var coordinates = partner
+                .getCoverageArea()
+                .getCoordinates()
+                .parallelStream()
+                .map(l -> {
+                    var positions = l.get(0).parallelStream().map(Position::new).collect(Collectors.toList());
+
+                    return new PolygonCoordinates(positions, positions);
+                })
+                .collect(Collectors.toList());
+
         return PartnerDocument
                 .builder()
                 .id(partner.getId())
                 .tradingName(partner.getTradingName())
                 .ownerName(partner.getOwnerName())
                 .document(partner.getDocument())
-                .coverageArea(partner.getCoverageArea())
-                .address(partner.getAddress())
+                .coverageArea(new MultiPolygon(coordinates))
+                .address(new Point(new Position(partner.getAddress().getCoordinates())))
                 .build();
     }
 }

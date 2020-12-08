@@ -1,6 +1,6 @@
 package com.github.charlesluxinger.gisapi.controller;
 
-import com.github.charlesluxinger.gisapi.controller.domain.model.ApiExceptionResponse;
+import com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse;
 import com.github.charlesluxinger.gisapi.controller.model.PartnerPayload;
 import com.github.charlesluxinger.gisapi.controller.model.PartnerResponse;
 import io.swagger.v3.oas.annotations.Operation;

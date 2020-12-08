@@ -2,9 +2,9 @@ package com.github.charlesluxinger.gisapi.controller.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.charlesluxinger.gisapi.domain.model.Address;
+import com.github.charlesluxinger.gisapi.domain.model.CoverageArea;
 import com.github.charlesluxinger.gisapi.domain.model.Partner;
-import com.github.charlesluxinger.gisapi.infra.model.MultiPolygon;
-import com.github.charlesluxinger.gisapi.infra.model.Point;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -40,11 +40,11 @@ public class PartnerPayload {
 
     @Schema(example = "{\"type\": \"MultiPolygon\", \"coordinates\": [[[[30, 20], [45, 40], [10, 40], [30, 20]]]]}")
     @NotNull
-    private final MultiPolygon coverageArea;
+    private final CoverageArea coverageArea;
 
     @Schema(example = "{\"type\": \"Point\", \"coordinates\": [-46.57421, -21.785741]}")
     @NotNull
-    private final Point address;
+    private final Address address;
 
     public Partner toDomain() {
         return Partner
