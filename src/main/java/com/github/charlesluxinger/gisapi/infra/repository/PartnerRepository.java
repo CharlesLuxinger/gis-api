@@ -1,6 +1,6 @@
 package com.github.charlesluxinger.gisapi.infra.repository;
 
-import com.github.charlesluxinger.gisapi.infra.domain.model.PartnerDocument;
+import com.github.charlesluxinger.gisapi.infra.model.PartnerDocument;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 

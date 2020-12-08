@@ -1,7 +1,7 @@
 package com.github.charlesluxinger.gisapi.domain.model;
 
-import com.github.charlesluxinger.gisapi.infra.domain.model.MultiPolygon;
-import com.github.charlesluxinger.gisapi.infra.domain.model.Point;
+import com.github.charlesluxinger.gisapi.infra.model.MultiPolygon;
+import com.github.charlesluxinger.gisapi.infra.model.Point;
 import lombok.Builder;
 import lombok.Getter;
 

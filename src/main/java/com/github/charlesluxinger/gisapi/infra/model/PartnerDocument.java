@@ -1,12 +1,15 @@
-package com.github.charlesluxinger.gisapi.infra.domain.model;
+package com.github.charlesluxinger.gisapi.infra.model;
 
 import com.github.charlesluxinger.gisapi.domain.model.Partner;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -25,7 +28,7 @@ import javax.validation.constraints.NotNull;
 public class PartnerDocument {
 
     @NotBlank
-    @Field
+    @MongoId(FieldType.OBJECT_ID)
     private String id;
 
     @NotBlank
@@ -38,6 +41,7 @@ public class PartnerDocument {
 
     @NotBlank
     @Field
+    @Indexed(unique = true, name = "document_index")
     private String document;
 
     @NotNull
@@ -57,6 +61,18 @@ public class PartnerDocument {
                 .document(this.document)
                 .coverageArea(this.coverageArea)
                 .address(this.address)
+                .build();
+    }
+
+    public static PartnerDocument of(final Partner partner) {
+        return PartnerDocument
+                .builder()
+                .id(partner.getId())
+                .tradingName(partner.getTradingName())
+                .ownerName(partner.getOwnerName())
+                .document(partner.getDocument())
+                .coverageArea(partner.getCoverageArea())
+                .address(partner.getAddress())
                 .build();
     }
 }

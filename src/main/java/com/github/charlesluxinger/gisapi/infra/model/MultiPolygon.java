@@ -1,4 +1,4 @@
-package com.github.charlesluxinger.gisapi.infra.domain.model;
+package com.github.charlesluxinger.gisapi.infra.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
