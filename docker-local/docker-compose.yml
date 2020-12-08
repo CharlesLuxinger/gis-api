@@ -4,10 +4,29 @@ services:
     mongodb.gis.api:
         container_name: mongodb.gis.api
         image: mongo:4.4.2
+        networks:
+            - bubble
         ports:
             - 27017:27017
         volumes:
             - mongodb:/data/db/
 
+    api.gis.dev:
+        container_name: api.gis.dev
+        build:
+            context: ../
+            dockerfile: docker-local/Dockerfile
+        depends_on:
+            - mongodb.gis.api
+        env_file:
+            - env-docker
+        networks:
+            - bubble
+        ports:
+            - 9000:9000
+
 volumes:
     mongodb:
+
+networks:
+    bubble:
