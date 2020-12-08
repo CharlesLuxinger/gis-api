@@ -16,4 +16,10 @@ spring:
             database: ${GIS_API_DB_DATABASE}
     main.banner-mode: off
 
+springdoc:
+    api-docs:
+        path: /api-docs
+        resolve-schema-properties: true
+    swagger-ui.path: /
+
 logging.pattern.console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %magenta([%t]) %m%n"
