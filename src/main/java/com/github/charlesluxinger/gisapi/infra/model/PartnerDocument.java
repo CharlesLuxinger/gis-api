@@ -39,6 +39,7 @@ public class PartnerDocument {
 
     public static final String PARTNERS_COLLECTION_NAME = "partners";
     public static final String COVERAGE_AREA = "coverageArea";
+    public static final String ADDRESS = "address";
     public static final String DOCUMENT = "document";
 
     @NotBlank
@@ -62,7 +63,7 @@ public class PartnerDocument {
     private GeoJsonMultiPolygon coverageArea;
 
     @NotNull
-    @Field
+    @Field(ADDRESS)
     private GeoJsonPoint address;
 
     public Partner toDomain() {

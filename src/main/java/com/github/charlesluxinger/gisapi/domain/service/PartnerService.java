@@ -31,11 +31,14 @@ public class PartnerService {
     }
 
     public Mono<Partner> insertIfNotExists(@Valid @NotNull final Partner partners) {
-        return Mono
-                .just(partners)
-                .map(PartnerDocument::of)
-                .flatMap(repository::insertIfNotExists)
-                .map(PartnerDocument::toDomain);
+        return repository.existsPartnerDocumentByDocument(partners.getDocument())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new IllegalStateException(String.format("Partner with document '#%s' already exists.", partners.getDocument())));
+                    }
+
+                    return repository.insert(PartnerDocument.of(partners)).map(PartnerDocument::toDomain);
+                });
     }
 
     public Mono<Partner> findNearbyByLongitudeAndLatitude(final double longitude, final double latitude) {

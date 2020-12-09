@@ -10,6 +10,5 @@ import reactor.core.publisher.Mono;
 public interface PartnerRepositoryCustom {
 
     Mono<PartnerDocument> findNearbyByLongitudeAndLatitude(final double longitude, final double latitude);
-    Mono<PartnerDocument> insertIfNotExists(PartnerDocument partners);
 
 }
