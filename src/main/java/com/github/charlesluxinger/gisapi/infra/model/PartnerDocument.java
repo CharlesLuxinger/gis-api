@@ -3,15 +3,15 @@ package com.github.charlesluxinger.gisapi.infra.model;
 import com.github.charlesluxinger.gisapi.domain.model.Address;
 import com.github.charlesluxinger.gisapi.domain.model.CoverageArea;
 import com.github.charlesluxinger.gisapi.domain.model.Partner;
-import com.mongodb.client.model.geojson.MultiPolygon;
-import com.mongodb.client.model.geojson.Point;
-import com.mongodb.client.model.geojson.PolygonCoordinates;
-import com.mongodb.client.model.geojson.Position;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.geo.Point;
+import org.springframework.data.geo.Polygon;
+import org.springframework.data.mongodb.core.geo.GeoJsonMultiPolygon;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -21,6 +21,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.github.charlesluxinger.gisapi.infra.model.PartnerDocument.PARTNERS_COLLECTION_NAME;
 
 /**
  * Class comments go here...
@@ -32,8 +34,10 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Document("partners")
+@Document(PARTNERS_COLLECTION_NAME)
 public class PartnerDocument {
+
+    public static final String PARTNERS_COLLECTION_NAME = "partners";
 
     @NotBlank
     @MongoId(FieldType.OBJECT_ID)
@@ -49,25 +53,26 @@ public class PartnerDocument {
 
     @NotBlank
     @Field
-    @Indexed(unique = true, name = "document_index")
     private String document;
 
     @NotNull
     @Field
-    private MultiPolygon coverageArea;
+    private GeoJsonMultiPolygon coverageArea;
 
     @NotNull
     @Field
-    private Point address;
+    private GeoJsonPoint address;
 
     public Partner toDomain() {
-        List<List<List<Double>>> collect = coverageArea
+        var coordinates = coverageArea
                 .getCoordinates()
                 .parallelStream()
-                .map(PolygonCoordinates::getExterior)
-                .collect(Collectors.toList())
-                .parallelStream()
-                .map(c -> c.parallelStream().map(Position::getValues).collect(Collectors.toList()))
+                .map(Polygon::getPoints)
+                .map(c ->
+                        c.parallelStream()
+                        .map(a -> List.of(a.getX(), a.getY()))
+                        .collect(Collectors.toList())
+                )
                 .collect(Collectors.toList());
 
         return Partner
@@ -76,31 +81,31 @@ public class PartnerDocument {
                 .tradingName(this.tradingName)
                 .ownerName(this.ownerName)
                 .document(this.document)
-                .coverageArea(CoverageArea.of(collect))
-                .address(Address.of(address.getCoordinates().getValues()))
+                .coverageArea(CoverageArea.of(coordinates))
+                .address(Address.of(List.of(address.getX(), address.getY())))
                 .build();
     }
 
     public static PartnerDocument of(final Partner partner) {
-        var coordinates = partner
+        var longitude = partner.getAddress().getCoordinates().get(0);
+        var latitude = partner.getAddress().getCoordinates().get(1);
+
+        var points = partner
                 .getCoverageArea()
                 .getCoordinates()
+                .get(0)
+                .get(0)
                 .parallelStream()
-                .map(l -> {
-                    var positions = l.get(0).parallelStream().map(Position::new).collect(Collectors.toList());
-
-                    return new PolygonCoordinates(positions, positions);
-                })
+                .map(c -> new Point(c.get(0), c.get(1)))
                 .collect(Collectors.toList());
 
-        return PartnerDocument
-                .builder()
+        return builder()
                 .id(partner.getId())
                 .tradingName(partner.getTradingName())
                 .ownerName(partner.getOwnerName())
                 .document(partner.getDocument())
-                .coverageArea(new MultiPolygon(coordinates))
-                .address(new Point(new Position(partner.getAddress().getCoordinates())))
+                .coverageArea(new GeoJsonMultiPolygon(List.of(new GeoJsonPolygon(points))))
+                .address(new GeoJsonPoint(longitude, latitude))
                 .build();
     }
 }

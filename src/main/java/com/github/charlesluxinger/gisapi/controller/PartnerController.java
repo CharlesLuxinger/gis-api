@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.Set;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
@@ -26,7 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Partner")
 public interface PartnerController {
 
-    @Operation(summary = "Get a Partner", responses = {
+    @Operation(summary = "Get a Partner by Id", responses = {
             @ApiResponse(responseCode = "200", description = "Return a Partner",  content = @Content(
                     schema =  @Schema(implementation = PartnerResponse.class), mediaType = APPLICATION_JSON_VALUE)),
             @ApiResponse(responseCode = "404", description = "Not Found Exception",  content = @Content(
@@ -35,8 +36,19 @@ public interface PartnerController {
     @Parameter(name = "id", in = PATH, required = true, description = "Partner Id", example = "1")
     Mono<ResponseEntity> findById(final String id);
 
-    @Operation(summary = "Save a List of Partner", responses = {
-            @ApiResponse(responseCode = "201", description = "Created a List of Partner",  content = @Content(
+    @Operation(summary = "Get a nearby Partner", responses = {
+            @ApiResponse(responseCode = "200", description = "Return a nearby Partner",  content = @Content(
+                    schema =  @Schema(implementation = PartnerResponse.class), mediaType = APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "404", description = "Not Found Exception",  content = @Content(
+                    schema =  @Schema(implementation = ApiExceptionResponse.class), mediaType = APPLICATION_JSON_VALUE))
+    })
+    @Parameter(name = "longitude", in = QUERY, required = true, description = "User longitude position", example = "1")
+    @Parameter(name = "latitude", in = QUERY, required = true, description = "User latitude position", example = "1")
+    Mono<ResponseEntity> findNearbyByLongitudeAndLatitude(final double longitude,
+                                                          final double latitude);
+
+    @Operation(summary = "Save a List of Partners", responses = {
+            @ApiResponse(responseCode = "201", description = "Created a List of Partners",  content = @Content(
                     schema =  @Schema(implementation = PartnerResponse.class), mediaType = APPLICATION_JSON_VALUE))
     })
     Flux<PartnerResponse> saveAll(@RequestBody Set<PartnerPayload> partners);

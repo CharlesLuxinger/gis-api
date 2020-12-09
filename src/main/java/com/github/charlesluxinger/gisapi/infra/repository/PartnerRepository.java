@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  * @version 1.0.0 07/12/20
  */
 @Repository
-public interface PartnerRepository extends ReactiveMongoRepository<PartnerDocument, String> {}
+public interface PartnerRepository extends PartnerRepositoryCustom, ReactiveMongoRepository<PartnerDocument, String> {}

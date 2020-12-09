@@ -41,4 +41,9 @@ public class PartnerService {
                 .map(PartnerDocument::toDomain);
     }
 
+    public Mono<Partner> findNearbyByLongitudeAndLatitude(final double longitude, final double latitude) {
+        return repository
+                .findNearbyByLongitudeAndLatitude(longitude, latitude)
+                .map(PartnerDocument::toDomain);
+    }
 }
