@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Set;
+import java.net.URI;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -45,9 +44,9 @@ public class PartnerControllerImpl implements PartnerController {
                                 .contentType(APPLICATION_JSON)
                                 .body(ApiExceptionResponse
                                         .builder()
-                                        .status(HttpStatus.NOT_FOUND.ordinal())
+                                        .status(HttpStatus.NOT_FOUND.value())
                                         .title(HttpStatus.NOT_FOUND.getReasonPhrase())
-                                        .detail(String.format("Partner #%s Not Found", id))
+                                        .detail(String.format("Partner '#%s' Not Found", id))
                                         .path(String.format("api/v1/partner/%s", id))
                                         .build()));
     }
@@ -65,7 +64,7 @@ public class PartnerControllerImpl implements PartnerController {
                         .contentType(APPLICATION_JSON)
                         .body(ApiExceptionResponse
                                 .builder()
-                                .status(HttpStatus.NOT_FOUND.ordinal())
+                                .status(HttpStatus.NOT_FOUND.value())
                                 .title(HttpStatus.NOT_FOUND.getReasonPhrase())
                                 .detail(String.format("Not Found nearby Partner at long:%f lat:%f", longitude, latitude))
                                 .path(String.format("api/v1/partner?long=%f&lat=%f", longitude, latitude))
@@ -75,13 +74,29 @@ public class PartnerControllerImpl implements PartnerController {
     @Override
     @ResponseStatus(CREATED)
     @PostMapping(value = "/partner",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public Flux<PartnerResponse> saveAll(@RequestBody final Set<PartnerPayload> partners){
-        return Flux
-                .fromIterable(partners)
+    public Mono<ResponseEntity> save(@RequestBody final PartnerPayload partners){
+        return Mono
+                .just(partners)
                 .map(PartnerPayload::toDomain)
-                .collectList()
-                .flatMapMany(service::saveAll)
-                .map(PartnerResponse::of);
+                .flatMap(service::insertIfNotExists)
+                .map(p -> ResponseEntity.created(URI.create("api/v1/partner")).body(PartnerResponse.of(p)))
+                .cast(ResponseEntity.class)
+                .onErrorResume(err -> {
+                    if (err.getClass() == IllegalStateException.class) {
+                        return Mono.just(ResponseEntity
+                                .badRequest()
+                                .contentType(APPLICATION_JSON)
+                                .body(ApiExceptionResponse
+                                        .builder()
+                                        .status(HttpStatus.BAD_REQUEST.value())
+                                        .title(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                                        .detail(err.getLocalizedMessage())
+                                        .path("api/v1/partner")
+                                        .build()));
+                    }
+
+                    return Mono.error(err);
+                });
     }
 
 }

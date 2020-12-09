@@ -10,11 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
@@ -51,5 +47,6 @@ public interface PartnerController {
             @ApiResponse(responseCode = "201", description = "Created a List of Partners",  content = @Content(
                     schema =  @Schema(implementation = PartnerResponse.class), mediaType = APPLICATION_JSON_VALUE))
     })
-    Flux<PartnerResponse> saveAll(@RequestBody Set<PartnerPayload> partners);
+    Mono<ResponseEntity> save(final PartnerPayload partners);
+
 }

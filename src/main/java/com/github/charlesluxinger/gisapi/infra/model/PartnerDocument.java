@@ -38,6 +38,8 @@ import static com.github.charlesluxinger.gisapi.infra.model.PartnerDocument.PART
 public class PartnerDocument {
 
     public static final String PARTNERS_COLLECTION_NAME = "partners";
+    public static final String COVERAGE_AREA = "coverageArea";
+    public static final String DOCUMENT = "document";
 
     @NotBlank
     @MongoId(FieldType.OBJECT_ID)
@@ -52,11 +54,11 @@ public class PartnerDocument {
     private String ownerName;
 
     @NotBlank
-    @Field
+    @Field(DOCUMENT)
     private String document;
 
     @NotNull
-    @Field
+    @Field(COVERAGE_AREA)
     private GeoJsonMultiPolygon coverageArea;
 
     @NotNull

@@ -6,13 +6,11 @@ import com.github.charlesluxinger.gisapi.infra.repository.PartnerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
 
 /**
  * @author Charles Luxinger
@@ -32,12 +30,11 @@ public class PartnerService {
                 .map(PartnerDocument::toDomain);
     }
 
-    public Flux<Partner> saveAll(@Valid @NotNull final Collection<Partner> partners) {
-        return Flux
-                .fromIterable(partners)
+    public Mono<Partner> insertIfNotExists(@Valid @NotNull final Partner partners) {
+        return Mono
+                .just(partners)
                 .map(PartnerDocument::of)
-                .collectList()
-                .flatMapMany(repository::saveAll)
+                .flatMap(repository::insertIfNotExists)
                 .map(PartnerDocument::toDomain);
     }
 
