@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 
+import static com.github.charlesluxinger.gisapi.controller.PartnerControllerImpl.LATITUDE;
+import static com.github.charlesluxinger.gisapi.controller.PartnerControllerImpl.LONGITUDE;
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -38,10 +40,10 @@ public interface PartnerController {
             @ApiResponse(responseCode = "404", description = "Not Found Exception",  content = @Content(
                     schema =  @Schema(implementation = ApiExceptionResponse.class), mediaType = APPLICATION_JSON_VALUE))
     })
-    @Parameter(name = "longitude", in = QUERY, required = true, description = "User longitude position", example = "1")
-    @Parameter(name = "latitude", in = QUERY, required = true, description = "User latitude position", example = "1")
-    Mono<ResponseEntity> findNearbyByLongitudeAndLatitude(final double longitude,
-                                                          final double latitude);
+    @Parameter(name = LONGITUDE, in = QUERY, required = true, description = "User longitude position", example = "1")
+    @Parameter(name = LATITUDE, in = QUERY, required = true, description = "User latitude position", example = "1")
+    Mono<ResponseEntity> findNearbyAndCoverageArea(final double longitude,
+                                                   final double latitude);
 
     @Operation(summary = "Save a List of Partners", responses = {
             @ApiResponse(responseCode = "201", description = "Created a List of Partners",  content = @Content(

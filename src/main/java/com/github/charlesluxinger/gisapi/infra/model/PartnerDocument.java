@@ -102,7 +102,8 @@ public class PartnerDocument {
                 .map(c -> new Point(c.get(0), c.get(1)))
                 .collect(Collectors.toList());
 
-        return builder()
+        return PartnerDocument
+                .builder()
                 .id(partner.getId())
                 .tradingName(partner.getTradingName())
                 .ownerName(partner.getOwnerName())

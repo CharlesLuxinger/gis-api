@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,13 +28,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @version 1.0.0 07/12/20
  */
 @RestController
+@RequestMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 public class PartnerControllerImpl implements PartnerController {
 
     private final PartnerService service;
 
+    public static final String LONGITUDE = "long";
+    public static final String LATITUDE = "lat";
+
     @Override
-    @GetMapping(value = "/partner/{id}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/partner/{id}")
     public Mono<ResponseEntity> findById(@PathVariable final String id){
         return service
                 .findById(id)
@@ -52,11 +57,11 @@ public class PartnerControllerImpl implements PartnerController {
     }
 
     @Override
-    @GetMapping(value = "/partner", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity> findNearbyByLongitudeAndLatitude(@RequestParam("long") final double longitude,
-                                                                 @RequestParam("lat") final double latitude){
+    @GetMapping(value = "/partner")
+    public Mono<ResponseEntity> findNearbyAndCoverageArea(@RequestParam(LONGITUDE) final double longitude,
+                                                          @RequestParam(LATITUDE) final double latitude){
         return service
-                .findNearbyByLongitudeAndLatitude(longitude, latitude)
+                .findNearbyAndCoverageArea(longitude, latitude)
                 .map(p -> ResponseEntity.ok(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
                 .defaultIfEmpty(ResponseEntity
@@ -73,7 +78,7 @@ public class PartnerControllerImpl implements PartnerController {
 
     @Override
     @ResponseStatus(CREATED)
-    @PostMapping(value = "/partner",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/partner")
     public Mono<ResponseEntity> save(@RequestBody final PartnerPayload partners){
         return Mono
                 .just(partners)

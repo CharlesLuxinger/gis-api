@@ -41,9 +41,9 @@ public class PartnerService {
                 });
     }
 
-    public Mono<Partner> findNearbyByLongitudeAndLatitude(final double longitude, final double latitude) {
+    public Mono<Partner> findNearbyAndCoverageArea(final double longitude, final double latitude) {
         return repository
-                .findNearbyByLongitudeAndLatitude(longitude, latitude)
+                .findNearbyAndCoverageArea(longitude, latitude)
                 .map(PartnerDocument::toDomain);
     }
 }

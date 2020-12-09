@@ -19,11 +19,11 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 @AllArgsConstructor
 public class PartnerRepositoryCustomImpl implements PartnerRepositoryCustom {
 
-    private static final String COORDINATES = ".coordinates";
+    public static final String COORDINATES = ".coordinates";
     private final ReactiveMongoTemplate template;
 
     @Override
-    public Mono<PartnerDocument> findNearbyByLongitudeAndLatitude(final double longitude, final double latitude) {
+    public Mono<PartnerDocument> findNearbyAndCoverageArea(final double longitude, final double latitude) {
         var criteria = Criteria
                 .where(COVERAGE_AREA)
                 .intersects(new GeoJsonPoint(longitude, latitude))
