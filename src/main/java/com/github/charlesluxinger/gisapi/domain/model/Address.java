@@ -2,6 +2,7 @@ package com.github.charlesluxinger.gisapi.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import static com.github.charlesluxinger.gisapi.domain.model.CoordinateType.POIN
  * @version 1.0.0 07/12/20
  */
 @Getter
+@ToString
 @AllArgsConstructor
 public class Address {
 

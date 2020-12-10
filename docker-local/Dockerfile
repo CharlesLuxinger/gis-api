@@ -7,9 +7,9 @@ RUN mvn dependency:go-offline
 
 COPY src src
 
-RUN mvn package --batch-mode -DskipTests
+RUN mvn package --batch-mode
 
-FROM adoptopenjdk/openjdk11:jdk-11.0.9_11-alpine-slim AS release
+FROM adoptopenjdk/openjdk11:jre-11.0.9.1_1-alpine AS release
 
 COPY --from=build /build/target/*.jar /app.jar
 

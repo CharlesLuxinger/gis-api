@@ -28,12 +28,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @version 1.0.0 07/12/20
  */
 @RestController
-@RequestMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(produces = APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 public class PartnerControllerImpl implements PartnerController {
 
     private final PartnerService service;
 
+    private static final String PARTNER_PATH = "api/v1/partner";
+    private static final String NOT_FOUND_NEARBY_PARTNER_ERROR = "Not Found nearby Partner at long:%f lat:%f";
     public static final String LONGITUDE = "long";
     public static final String LATITUDE = "lat";
 
@@ -52,7 +54,7 @@ public class PartnerControllerImpl implements PartnerController {
                                         .status(HttpStatus.NOT_FOUND.value())
                                         .title(HttpStatus.NOT_FOUND.getReasonPhrase())
                                         .detail(String.format("Partner '#%s' Not Found", id))
-                                        .path(String.format("api/v1/partner/%s", id))
+                                        .path(String.format(PARTNER_PATH +"/%s", id))
                                         .build()));
     }
 
@@ -71,36 +73,36 @@ public class PartnerControllerImpl implements PartnerController {
                                 .builder()
                                 .status(HttpStatus.NOT_FOUND.value())
                                 .title(HttpStatus.NOT_FOUND.getReasonPhrase())
-                                .detail(String.format("Not Found nearby Partner at long:%f lat:%f", longitude, latitude))
-                                .path(String.format("api/v1/partner?long=%f&lat=%f", longitude, latitude))
+                                .detail(String.format(NOT_FOUND_NEARBY_PARTNER_ERROR, longitude, latitude))
+                                .path(String.format(PARTNER_PATH + "?long=%f&lat=%f", longitude, latitude))
                                 .build()));
     }
 
     @Override
     @ResponseStatus(CREATED)
-    @PostMapping(value = "/partner")
+    @PostMapping(value = "/partner", consumes = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity> save(@RequestBody final PartnerPayload partners){
         return Mono
                 .just(partners)
                 .map(PartnerPayload::toDomain)
                 .flatMap(service::insertIfNotExists)
-                .map(p -> ResponseEntity.created(URI.create("api/v1/partner")).body(PartnerResponse.of(p)))
+                .map(p -> ResponseEntity.created(URI.create(PARTNER_PATH)).body(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
                 .onErrorResume(err -> {
-                    if (err.getClass() == IllegalStateException.class) {
-                        return Mono.just(ResponseEntity
-                                .badRequest()
-                                .contentType(APPLICATION_JSON)
-                                .body(ApiExceptionResponse
-                                        .builder()
-                                        .status(HttpStatus.BAD_REQUEST.value())
-                                        .title(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                                        .detail(err.getLocalizedMessage())
-                                        .path("api/v1/partner")
-                                        .build()));
+                    if (err.getClass() != IllegalStateException.class) {
+                        return Mono.error(err);
                     }
 
-                    return Mono.error(err);
+                    return Mono.just(ResponseEntity
+                            .badRequest()
+                            .contentType(APPLICATION_JSON)
+                            .body(ApiExceptionResponse
+                                    .builder()
+                                    .status(HttpStatus.BAD_REQUEST.value())
+                                    .title(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                                    .detail(err.getLocalizedMessage())
+                                    .path(PARTNER_PATH)
+                                    .build()));
                 });
     }
 

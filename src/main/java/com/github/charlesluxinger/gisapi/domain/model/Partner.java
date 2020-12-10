@@ -2,6 +2,7 @@ package com.github.charlesluxinger.gisapi.domain.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author Charles Luxinger
@@ -9,6 +10,7 @@ import lombok.Getter;
  */
 @Builder
 @Getter
+@ToString
 public class Partner {
 
     private final String id;

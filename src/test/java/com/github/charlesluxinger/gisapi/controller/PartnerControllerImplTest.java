@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonMultiPolygon;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 import org.springframework.data.mongodb.core.index.GeospatialIndex;
+import org.springframework.data.mongodb.core.index.Index;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.mongodb.core.index.GeoSpatialIndexType.GEO_2DSPHERE;
 
 /**
@@ -43,11 +45,11 @@ import static org.springframework.data.mongodb.core.index.GeoSpatialIndexType.GE
 class PartnerControllerImplTest {
 
     private static final String ID = "5fd003a8e6c31b4012d5f55a";
-    public static final String DOCUMENT = "02.546.716/00170";
-    public static final String TRADING_NAME = "Adega Osasco";
-    public static final String OWNER_NAME = "Ze da Ambev";
-    public static final String MULTI_POLYGON = "MultiPolygon";
-    public static final String POINT = "Point";
+    private static final String DOCUMENT = "02.546.716/00170";
+    private static final String TRADING_NAME = "Adega Osasco";
+    private static final String OWNER_NAME = "Ze da Ambev";
+    private static final String MULTI_POLYGON = "MultiPolygon";
+    private static final String POINT = "Point";
 
     @LocalServerPort
     private int port;
@@ -190,6 +192,10 @@ class PartnerControllerImplTest {
     @Test
     @DisplayName("should return status 400 when save an exists partner")
     void should_return_status_400_when_save_an_exists_partner() {
+        template.indexOps(PARTNERS_COLLECTION_NAME)
+                .ensureIndex(new Index(DOCUMENT, ASC).unique())
+                .block();
+
         repository.insert(buildPartnerDocument(ID)).block();
 
         given()
