@@ -1,8 +1,6 @@
-package com.github.charlesluxinger.gisapi.controller.model;
+package com.github.charlesluxinger.gisapi.controller.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.charlesluxinger.gisapi.domain.model.Address;
-import com.github.charlesluxinger.gisapi.domain.model.CoverageArea;
 import com.github.charlesluxinger.gisapi.domain.model.Partner;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -41,11 +39,10 @@ public class PartnerResponse {
 
     @Schema(example = "{\"type\": \"MultiPolygon\", \"coordinates\": [[[[30, 20], [45, 40], [10, 40], [30, 20]]]]}")
     @NotNull
-    private final CoverageArea coverageArea;
+    private final CoverageAreaResponse coverageArea;
 
-    @Schema(example = "{\"type\": \"Point\", \"coordinates\": [-46.57421, -21.785741]}")
     @NotNull
-    private final Address address;
+    private final AddressResponse address;
 
     public static PartnerResponse of(final Partner partner) {
         return PartnerResponse
@@ -54,8 +51,8 @@ public class PartnerResponse {
                 .tradingName(partner.getTradingName())
                 .ownerName(partner.getOwnerName())
                 .document(partner.getDocument())
-                .coverageArea(partner.getCoverageArea())
-                .address(partner.getAddress())
+                .coverageArea(CoverageAreaResponse.of(partner.getCoverageArea()))
+                .address(AddressResponse.of(partner.getAddress()))
                 .build();
     }
 

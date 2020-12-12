@@ -25,18 +25,18 @@ import static org.bson.types.ObjectId.isValid;
 @AllArgsConstructor
 public class PartnerService {
 
-    public static final String INVALID_OBJECT_ID_DETAIL = "Invalid ObjectId #%s";
-    public static final String EXISTS_ERROR_MESSAGE = "Partner with document '#%s' already exists.";
+    protected static final String INVALID_OBJECT_ID_DETAIL = "Invalid ObjectId #%s";
+    protected static final String EXISTS_ERROR_MESSAGE = "Partner with document '#%s' already exists.";
     private final PartnerRepository repository;
 
     public Mono<Partner> findById(@NotBlank final String id) {
-        if (!isValid(id)) {
-            return Mono.error(new IllegalArgumentException(String.format(INVALID_OBJECT_ID_DETAIL, id)));
+        if (isValid(id)) {
+            return repository
+                    .findById(id)
+                    .map(PartnerDocument::toDomain);
         }
 
-        return repository
-                .findById(id)
-                .map(PartnerDocument::toDomain);
+        return Mono.error(new IllegalArgumentException(String.format(INVALID_OBJECT_ID_DETAIL, id)));
     }
 
     public Mono<Partner> insertIfNotExists(@Valid @NotNull final Partner partners) {

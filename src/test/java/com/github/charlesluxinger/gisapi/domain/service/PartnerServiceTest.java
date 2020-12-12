@@ -19,8 +19,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static com.github.charlesluxinger.gisapi.domain.model.CoordinateType.MULTI_POLYGON;
-import static com.github.charlesluxinger.gisapi.domain.model.CoordinateType.POINT;
+import static com.github.charlesluxinger.gisapi.controller.model.response.CoordinateType.MULTI_POLYGON;
+import static com.github.charlesluxinger.gisapi.controller.model.response.CoordinateType.POINT;
 import static com.github.charlesluxinger.gisapi.domain.service.PartnerService.EXISTS_ERROR_MESSAGE;
 import static com.github.charlesluxinger.gisapi.domain.service.PartnerService.INVALID_OBJECT_ID_DETAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -136,9 +136,10 @@ class PartnerServiceTest {
         assertEquals(partner.getDocument(), DOCUMENT);
         assertEquals(partner.getOwnerName(), OWNER_NAME);
         assertEquals(partner.getTradingName(), TRADING_NAME);
-        assertEquals(partner.getAddress().getType(), POINT);
-        assertFalse(partner.getAddress().getCoordinates().isEmpty());
-        assertEquals(partner.getCoverageArea().getType(), MULTI_POLYGON);
+        assertEquals(partner.getAddress().getType(), POINT.getValue());
+        assertEquals(partner.getAddress().getCoordinates().get(0), 1);
+        assertEquals(partner.getAddress().getCoordinates().get(1), 2);
+        assertEquals(partner.getCoverageArea().getType(), MULTI_POLYGON.getValue());
         assertFalse(partner.getCoverageArea().getCoordinates().isEmpty());
     }
 }

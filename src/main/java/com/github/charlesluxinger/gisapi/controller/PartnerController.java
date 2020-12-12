@@ -1,8 +1,8 @@
 package com.github.charlesluxinger.gisapi.controller;
 
-import com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse;
-import com.github.charlesluxinger.gisapi.controller.model.PartnerPayload;
-import com.github.charlesluxinger.gisapi.controller.model.PartnerResponse;
+import com.github.charlesluxinger.gisapi.controller.model.exception.ApiExceptionResponse;
+import com.github.charlesluxinger.gisapi.controller.model.request.PartnerRequest;
+import com.github.charlesluxinger.gisapi.controller.model.response.PartnerResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,6 +49,6 @@ public interface PartnerController {
             @ApiResponse(responseCode = "201", description = "Created a List of Partners",  content = @Content(
                     schema =  @Schema(implementation = PartnerResponse.class), mediaType = APPLICATION_JSON_VALUE))
     })
-    Mono<ResponseEntity> save(final PartnerPayload partners);
+    Mono<ResponseEntity> save(final PartnerRequest partners);
 
 }

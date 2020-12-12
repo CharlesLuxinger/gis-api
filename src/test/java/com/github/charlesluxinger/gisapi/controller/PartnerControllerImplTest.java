@@ -1,8 +1,5 @@
 package com.github.charlesluxinger.gisapi.controller;
 
-import com.github.charlesluxinger.gisapi.controller.model.PartnerPayload;
-import com.github.charlesluxinger.gisapi.domain.model.Address;
-import com.github.charlesluxinger.gisapi.domain.model.CoverageArea;
 import com.github.charlesluxinger.gisapi.infra.model.PartnerDocument;
 import com.github.charlesluxinger.gisapi.infra.repository.PartnerRepository;
 import io.restassured.RestAssured;
@@ -46,10 +43,15 @@ class PartnerControllerImplTest {
 
     private static final String ID = "5fd003a8e6c31b4012d5f55a";
     private static final String DOCUMENT = "02.546.716/00170";
-    private static final String TRADING_NAME = "Adega Osasco";
-    private static final String OWNER_NAME = "Ze da Ambev";
+    private static final String TRADING_NAME = "Boteco Caindo aos Pedaços";
+    private static final String OWNER_NAME = "Ze da Esquina";
     private static final String MULTI_POLYGON = "MultiPolygon";
     private static final String POINT = "Point";
+    private static final String BODY = "{\"tradingName\":\"Boteco Caindo aos Pedaços\",\"ownerName\":\"Ze da Esquina\",\"document\":\"02.546.716/00170\",\"coverageArea\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[0,1],[2,3],[4,5],[0,1]]]]},\"address\":{\"type\":\"Point\",\"coordinates\":[0,1]}}";
+
+    private static final Point p1 = new Point(0., 1.);
+    private static final Point p2 = new Point(2., 3.);
+    private static final Point p3 = new Point(4., 5.);
 
     @LocalServerPort
     private int port;
@@ -72,7 +74,7 @@ class PartnerControllerImplTest {
     @Test
     @DisplayName("should return status 200 when find by id")
     void should_return_status_200_when_find_by_id() {
-        repository.insert(buildPartnerDocument(ID)).block();
+        repository.insert(buildPartnerDocument()).block();
 
         given()
             .pathParam("id", ID)
@@ -134,17 +136,17 @@ class PartnerControllerImplTest {
     }
 
     @Test
-    @DisplayName("should return status 200 when finde by longitude and latitude")
+    @DisplayName("should return status 200 when find by longitude and latitude")
     void should_return_status_200_when_find_by_longitude_and_latitude() {
         template.indexOps(PARTNERS_COLLECTION_NAME)
                 .ensureIndex(new GeospatialIndex(ADDRESS + COORDINATES).typed(GEO_2DSPHERE))
                 .block();
 
-        repository.insert(buildPartnerDocument(ID)).block();
+        repository.insert(buildPartnerDocument()).block();
 
         given()
-            .queryParam(LONGITUDE, 2.)
-            .queryParam(LATITUDE, 3.)
+            .queryParam(LONGITUDE, 0.)
+            .queryParam(LATITUDE, 1.)
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
         .expect()
@@ -167,9 +169,8 @@ class PartnerControllerImplTest {
     void should_return_status_404_when_coverage_area_not_support_longitude_and_latitude_() {
         template.indexOps(PARTNERS_COLLECTION_NAME)
                 .ensureIndex(new GeospatialIndex(ADDRESS + COORDINATES).typed(GEO_2DSPHERE))
+                .flatMap($ -> repository.insert(buildPartnerDocument()))
                 .block();
-
-        repository.insert(buildPartnerDocument(ID)).block();
 
         given()
                 .queryParam(LONGITUDE, 1)
@@ -194,7 +195,7 @@ class PartnerControllerImplTest {
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body(buildPartnerPayload())
+            .body(BODY)
         .expect()
             .statusCode(201)
         .when()
@@ -215,14 +216,13 @@ class PartnerControllerImplTest {
     void should_return_status_400_when_save_an_exists_partner() {
         template.indexOps(PARTNERS_COLLECTION_NAME)
                 .ensureIndex(new Index(DOCUMENT, ASC).unique())
+                .flatMap($ -> repository.insert(buildPartnerDocument()))
                 .block();
-
-        repository.insert(buildPartnerDocument(ID)).block();
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body(buildPartnerPayload())
+            .body(BODY)
         .expect()
             .statusCode(400)
         .when()
@@ -235,28 +235,15 @@ class PartnerControllerImplTest {
             .body("timestamp", is(notNullValue()));
     }
 
-    private PartnerDocument buildPartnerDocument(final String id) {
-        var points = List.of(new Point(0, 1), new Point(2, 3), new Point(4, 5), new Point(0, 1));
-
+    private PartnerDocument buildPartnerDocument() {
         return PartnerDocument
                 .builder()
-                .id(id)
+                .id(ID)
                 .document(DOCUMENT)
                 .tradingName(TRADING_NAME)
                 .ownerName(OWNER_NAME)
-                .address(new GeoJsonPoint(1, 2))
-                .coverageArea(new GeoJsonMultiPolygon(List.of(new GeoJsonPolygon(points))))
-                .build();
-    }
-
-    private PartnerPayload buildPartnerPayload() {
-        return PartnerPayload
-                .builder()
-                .document(DOCUMENT)
-                .tradingName(TRADING_NAME)
-                .ownerName(OWNER_NAME)
-                .address(Address.of(List.of(0., 1.)))
-                .coverageArea(CoverageArea.of(List.of(List.of(List.of(0., 1.), List.of(2., 3.), List.of(4., 5.), List.of(0., 1.)))))
+                .address(new GeoJsonPoint(p1))
+                .coverageArea(new GeoJsonMultiPolygon(List.of(new GeoJsonPolygon(p1, p2, p3, p1))))
                 .build();
     }
 

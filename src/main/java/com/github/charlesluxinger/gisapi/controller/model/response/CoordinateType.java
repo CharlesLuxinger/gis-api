@@ -1,4 +1,4 @@
-package com.github.charlesluxinger.gisapi.domain.model;
+package com.github.charlesluxinger.gisapi.controller.model.response;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;

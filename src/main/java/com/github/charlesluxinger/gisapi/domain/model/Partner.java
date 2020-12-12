@@ -3,6 +3,8 @@ package com.github.charlesluxinger.gisapi.domain.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.geo.GeoJsonMultiPolygon;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 /**
  * @author Charles Luxinger
@@ -17,7 +19,7 @@ public class Partner {
     private final String tradingName;
     private final String ownerName;
     private final String document;
-    private final CoverageArea coverageArea;
-    private final Address address;
+    private final GeoJsonMultiPolygon coverageArea;
+    private final GeoJsonPoint address;
 
 }

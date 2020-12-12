@@ -1,7 +1,7 @@
 package com.github.charlesluxinger.gisapi.controller;
 
-import com.github.charlesluxinger.gisapi.controller.model.PartnerPayload;
-import com.github.charlesluxinger.gisapi.controller.model.PartnerResponse;
+import com.github.charlesluxinger.gisapi.controller.model.request.PartnerRequest;
+import com.github.charlesluxinger.gisapi.controller.model.response.PartnerResponse;
 import com.github.charlesluxinger.gisapi.domain.service.PartnerService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,8 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 import static com.github.charlesluxinger.gisapi.controller.PartnerControllerImpl.PARTNER_PATH;
-import static com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse.buildBadRequestResponse;
-import static com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse.buildNotFoundResponse;
+import static com.github.charlesluxinger.gisapi.controller.model.exception.ApiExceptionResponse.buildBadRequestResponse;
+import static com.github.charlesluxinger.gisapi.controller.model.exception.ApiExceptionResponse.buildNotFoundResponse;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -34,13 +34,13 @@ public class PartnerControllerImpl implements PartnerController {
 
     private final PartnerService service;
 
-    public static final String PARTNER_PATH = "/partner";
-    public static final String FIND_BY_ID_PATH_LOG = PARTNER_PATH + "/%s";
+    protected static final String PARTNER_PATH = "/partner";
+    protected static final String FIND_BY_ID_PATH_LOG = PARTNER_PATH + "/%s";
     private static final String QUERIES_PARAM = "?long=%f&lat=%f";
     private static final String PARTNER_NOT_FOUND_DETAIL = "Partner '#%s' Not Found";
     private static final String NOT_FOUND_NEARBY_PARTNER_ERROR = "Not Found nearby Partner at long:%f lat:%f";
-    public static final String LONGITUDE = "long";
-    public static final String LATITUDE = "lat";
+    protected static final String LONGITUDE = "long";
+    protected static final String LATITUDE = "lat";
 
     @Override
     @GetMapping(value = "/{id}")
@@ -75,10 +75,10 @@ public class PartnerControllerImpl implements PartnerController {
     @Override
     @ResponseStatus(CREATED)
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity> save(@RequestBody final PartnerPayload partners){
+    public Mono<ResponseEntity> save(@RequestBody final PartnerRequest partners){
         return Mono
                 .just(partners)
-                .map(PartnerPayload::toDomain)
+                .map(PartnerRequest::toDomain)
                 .flatMap(service::insertIfNotExists)
                 .map(p -> ResponseEntity.created(URI.create(PARTNER_PATH)).body(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)

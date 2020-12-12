@@ -1,6 +1,6 @@
 package com.github.charlesluxinger.gisapi.infra.config;
 
-import com.github.charlesluxinger.gisapi.domain.model.CoordinateType;
+import com.github.charlesluxinger.gisapi.controller.model.response.CoordinateType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;

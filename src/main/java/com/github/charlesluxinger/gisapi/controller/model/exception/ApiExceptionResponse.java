@@ -1,4 +1,4 @@
-package com.github.charlesluxinger.gisapi.controller.model;
+package com.github.charlesluxinger.gisapi.controller.model.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
