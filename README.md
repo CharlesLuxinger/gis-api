@@ -71,7 +71,7 @@ ___
     ```
 - Busca parceiro por ID:
     ```shell
-    $ curl -X GET 'http://localhost:9000/api/v1/partner/{id}' -H 'Content-type: application/json'
+    $ curl -X GET 'http://localhost:9000/api/v1/partner/{id}' -H 'Accept: application/json'
     ```
   Response:
     ```json
@@ -101,7 +101,7 @@ ___
     ```
 - Buscar um parceiro mais próximo e que esteja dentro da área de cobertura, passando os parâmetros de longitude `long` e latitude `lat`:
     ```shell
-    $ curl -X GET 'http://localhost:9000/api/v1/partner?lat=-23.61440&long=-46.62135'
+    $ curl -X GET 'http://localhost:9000/api/v1/partner?lat=-23.61440&long=-46.62135' -H 'Accept: application/json'
     ```
   Response:
     ```json
@@ -141,7 +141,7 @@ ___
 ---
 ## Disponibilizando a API ao público
 ### Database
-- Se faz necessário disponibilizar acesso ao MongoDB com as seguintes configurações realizadas:
+- Se faz necessário disponibilizar acesso a um database MongoDB com as seguintes configurações realizadas:
 1) Criar database `gis`
 1) Criar collection `partners`
 2) Criar os indexes: 
@@ -151,4 +151,4 @@ ___
     db.partners.createIndex({"document":1}, { unique: true })
    ```
 ### API
-- Para realizar deploy da aplicação em um cloud provider como por exemplo AWS Cold Build, realize um clone do projeto e utilize os arquivos `docker-compose.yml` e `Dockerfile` na raiz do projeto, considerando que o arquivo `.env` deva possuir as variáveis de acesso ao database.
+- Para realizar deploy da aplicação em um cloud provider podemos utilizar por exemplo a AWS Cold Build, realizando um clone do projeto e utilizar os arquivos `docker-compose.yml` e `Dockerfile` na raiz do projeto, considerando que o arquivo `.env` deva possuir as variáveis de acesso ao database.
