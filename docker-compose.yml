@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+    api.gis.dev:
+        container_name: api.gis.dev
+        build:
+            context: .
+            dockerfile: Dockerfile
+        env_file:
+            - .env
+        ports:
+            - 9000:9000

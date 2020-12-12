@@ -9,13 +9,12 @@ services:
         ports:
             - 27017:27017
         volumes:
+            - ./data.json:/data.json
             - mongodb:/data/db/
 
     api.gis.dev:
         container_name: api.gis.dev
-        build:
-            context: ../
-            dockerfile: docker-local/Dockerfile
+        image: charlesluxinger/gis-api
         depends_on:
             - mongodb.gis.api
         env_file:

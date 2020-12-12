@@ -3,18 +3,22 @@ server:
     compression:
         enabled: true
         mime-types: application/json
-    servlet:
-        context-path: /api/v1/
+    servlet.context-path: /api/v1/
+
 spring:
-    profiles:
-        active: ${APP_ENV}
-    application:
-        name: gis-api
-    data:
-        mongodb:
-            uri: ${GIS_API_DB_URI}
-            database: ${GIS_API_DB_DATABASE}
+    application.name: gis-api
+    data.mongodb:
+        uri: ${GIS_API_DB_URI}
+        database: ${GIS_API_DB_DATABASE}
     main.banner-mode: off
+
+management:
+    health.diskspace.enabled: false
+    endpoint.health.show-details: always
+    endpoints.web:
+        exposure:
+            include: health
+        base-path: /
 
 springdoc:
     api-docs:

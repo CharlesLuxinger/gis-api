@@ -3,18 +3,13 @@ server:
     compression:
         enabled: true
         mime-types: application/json
-    servlet:
-        context-path: /api/v1/
+    servlet.context-path: /api/v1/
 
 spring:
-    profiles:
-        active: TEST
-    application:
-        name: gis-api
-    data:
-        mongodb:
-            uri: mongodb://localhost:27017/
-            database: test
+    application.name: gis-api
+    data.mongodb:
+        uri: mongodb://localhost:27017/
+        database: test
     main.banner-mode: off
 
 logging.pattern.console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %magenta([%t]) %m%n"
