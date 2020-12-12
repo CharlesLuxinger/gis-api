@@ -25,7 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Partner")
 public interface PartnerController {
 
-    @Operation(summary = "Get a Partner by Id", responses = {
+    @Operation(summary = "Find a Partner by Id", responses = {
             @ApiResponse(responseCode = "200", description = "Return a Partner",  content = @Content(
                     schema =  @Schema(implementation = PartnerResponse.class), mediaType = APPLICATION_JSON_VALUE)),
             @ApiResponse(responseCode = "404", description = "Not Found Exception",  content = @Content(
@@ -45,8 +45,8 @@ public interface PartnerController {
     Mono<ResponseEntity> findNearbyAndCoverageArea(final double longitude,
                                                    final double latitude);
 
-    @Operation(summary = "Save a List of Partners", responses = {
-            @ApiResponse(responseCode = "201", description = "Created a List of Partners",  content = @Content(
+    @Operation(summary = "Save a Partners", responses = {
+            @ApiResponse(responseCode = "201", description = "Created a Partners",  content = @Content(
                     schema =  @Schema(implementation = PartnerResponse.class), mediaType = APPLICATION_JSON_VALUE))
     })
     Mono<ResponseEntity> save(final PartnerRequest partners);

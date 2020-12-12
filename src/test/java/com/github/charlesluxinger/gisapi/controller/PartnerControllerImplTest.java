@@ -49,10 +49,6 @@ class PartnerControllerImplTest {
     private static final String POINT = "Point";
     private static final String BODY = "{\"tradingName\":\"Boteco Caindo aos Pedaços\",\"ownerName\":\"Ze da Esquina\",\"document\":\"02.546.716/00170\",\"coverageArea\":{\"type\":\"MultiPolygon\",\"coordinates\":[[[[0,1],[2,3],[4,5],[0,1]]]]},\"address\":{\"type\":\"Point\",\"coordinates\":[0,1]}}";
 
-    private static final Point p1 = new Point(0., 1.);
-    private static final Point p2 = new Point(2., 3.);
-    private static final Point p3 = new Point(4., 5.);
-
     @LocalServerPort
     private int port;
 
@@ -236,6 +232,10 @@ class PartnerControllerImplTest {
     }
 
     private PartnerDocument buildPartnerDocument() {
+        var p1 = new Point(0., 1.);
+        var p2 = new Point(2., 3.);
+        var p3 = new Point(4., 5.);
+        
         return PartnerDocument
                 .builder()
                 .id(ID)

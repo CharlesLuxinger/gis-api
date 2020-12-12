@@ -45,19 +45,14 @@ public class PartnerControllerImpl implements PartnerController {
     @Override
     @GetMapping(value = "/{id}")
     public Mono<ResponseEntity> findById(@PathVariable final String id){
+        var path = String.format(FIND_BY_ID_PATH_LOG, id);
+
         return service
                 .findById(id)
                 .map(p -> ResponseEntity.ok(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
-                .defaultIfEmpty(buildNotFoundResponse(String.format(FIND_BY_ID_PATH_LOG, id),
-                                                      String.format(PARTNER_NOT_FOUND_DETAIL, id)))
-                .onErrorResume(err -> {
-                    if (err.getClass() != IllegalArgumentException.class) {
-                        return Mono.error(err);
-                    }
-
-                    return Mono.just(buildBadRequestResponse(String.format(FIND_BY_ID_PATH_LOG, id), err.getLocalizedMessage()));
-                });
+                .defaultIfEmpty(buildNotFoundResponse(path, String.format(PARTNER_NOT_FOUND_DETAIL, id)))
+                .onErrorResume(err -> mapError(err, path, IllegalArgumentException.class));
     }
 
     @Override
@@ -82,13 +77,11 @@ public class PartnerControllerImpl implements PartnerController {
                 .flatMap(service::insertIfNotExists)
                 .map(p -> ResponseEntity.created(URI.create(PARTNER_PATH)).body(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
-                .onErrorResume(err -> {
-                    if (err.getClass() != IllegalStateException.class) {
-                        return Mono.error(err);
-                    }
+                .onErrorResume(err -> mapError(err, PARTNER_PATH, IllegalStateException.class));
+    }
 
-                    return Mono.just(buildBadRequestResponse(PARTNER_PATH, err.getLocalizedMessage()));
-                });
+    private Mono<ResponseEntity> mapError(final Throwable err, final String path , final Class<? extends RuntimeException> clazz) {
+        return err.getClass() != clazz ? Mono.error(err) : Mono.just(buildBadRequestResponse(path, err.getLocalizedMessage()));
     }
 
 }
