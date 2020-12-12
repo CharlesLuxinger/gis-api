@@ -31,7 +31,7 @@ public interface PartnerController {
             @ApiResponse(responseCode = "404", description = "Not Found Exception",  content = @Content(
                     schema =  @Schema(implementation = ApiExceptionResponse.class), mediaType = APPLICATION_JSON_VALUE))
     })
-    @Parameter(name = "id", in = PATH, required = true, description = "Partner Id", example = "1")
+    @Parameter(name = "id", in = PATH, required = true, description = "Partner Id", example = "5fd41beb4dfb2437d93852eb")
     Mono<ResponseEntity> findById(final String id);
 
     @Operation(summary = "Get a nearby Partner", responses = {

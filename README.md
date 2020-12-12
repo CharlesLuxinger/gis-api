@@ -1,5 +1,10 @@
 # GIS API
 Aplicação para gerenciamento de parceiros e indicações com base na coordenadas geográficas do usuário.
+
+## Repositórios
+- [Github](https://github.com/CharlesLuxinger/gis-api)
+- [Docker Hub](https://hub.docker.com/r/charlesluxinger/gis-api)
+
 ## Dependências
 - [Maven 3.6.3](https://maven.apache.org/download.cgi)
 - [Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)

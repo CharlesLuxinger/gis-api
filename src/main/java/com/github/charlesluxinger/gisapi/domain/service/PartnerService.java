@@ -13,6 +13,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import static org.bson.types.ObjectId.isValid;
+
 /**
  * @author Charles Luxinger
  * @version 1.0.0 07/12/20
@@ -23,10 +25,15 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class PartnerService {
 
+    public static final String INVALID_OBJECT_ID_DETAIL = "Invalid ObjectId #%s";
     public static final String EXISTS_ERROR_MESSAGE = "Partner with document '#%s' already exists.";
     private final PartnerRepository repository;
 
     public Mono<Partner> findById(@NotBlank final String id) {
+        if (!isValid(id)) {
+            return Mono.error(new IllegalArgumentException(String.format(INVALID_OBJECT_ID_DETAIL, id)));
+        }
+
         return repository
                 .findById(id)
                 .map(PartnerDocument::toDomain);

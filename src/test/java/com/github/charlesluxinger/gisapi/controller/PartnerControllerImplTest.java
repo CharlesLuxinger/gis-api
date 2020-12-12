@@ -94,6 +94,27 @@ class PartnerControllerImplTest {
     }
 
     @Test
+    @DisplayName("should return status 400 when is not valid id")
+    void should_return_status_400_when_is_not_valid_id() {
+        var invalidId = "invalidId";
+
+        given()
+                .pathParam("id", invalidId)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+            .expect()
+                .statusCode(400)
+            .when()
+                .get("/{id}")
+            .then()
+                .body("status", is(400))
+                .body("title", equalTo("Bad Request"))
+                .body("path", equalTo(String.format("/partner/%s", invalidId)))
+                .body("detail", equalTo(String.format("Invalid ObjectId #%s", invalidId)))
+                .body("timestamp", is(notNullValue()));
+    }
+
+    @Test
     @DisplayName("should return status 404 when find by id")
     void should_return_status_404_when_find_by_id() {
         given()
@@ -107,7 +128,7 @@ class PartnerControllerImplTest {
         .then()
             .body("status", is(404))
             .body("title", equalTo("Not Found"))
-            .body("path", equalTo(String.format("api/v1/partner/%s", ID)))
+            .body("path", equalTo(String.format("/partner/%s", ID)))
             .body("detail", equalTo(String.format("Partner '#%s' Not Found", ID)))
             .body("timestamp", is(notNullValue()));
     }
@@ -162,7 +183,7 @@ class PartnerControllerImplTest {
             .then()
                 .body("status", is(404))
                 .body("title", equalTo("Not Found"))
-                .body("path", equalTo("api/v1/partner?long=1.000000&lat=2.000000"))
+                .body("path", equalTo("/partner?long=1.000000&lat=2.000000"))
                 .body("detail", equalTo("Not Found nearby Partner at long:1.000000 lat:2.000000"))
                 .body("timestamp", is(notNullValue()));
     }
@@ -209,7 +230,7 @@ class PartnerControllerImplTest {
         .then()
             .body("status", is(400))
             .body("title", equalTo("Bad Request"))
-            .body("path", equalTo("api/v1/partner"))
+            .body("path", equalTo("/partner"))
             .body("detail", equalTo(String.format("Partner with document '#%s' already exists.", DOCUMENT)))
             .body("timestamp", is(notNullValue()));
     }

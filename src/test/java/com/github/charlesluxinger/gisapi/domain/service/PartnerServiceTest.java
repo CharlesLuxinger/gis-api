@@ -22,6 +22,7 @@ import java.util.List;
 import static com.github.charlesluxinger.gisapi.domain.model.CoordinateType.MULTI_POLYGON;
 import static com.github.charlesluxinger.gisapi.domain.model.CoordinateType.POINT;
 import static com.github.charlesluxinger.gisapi.domain.service.PartnerService.EXISTS_ERROR_MESSAGE;
+import static com.github.charlesluxinger.gisapi.domain.service.PartnerService.INVALID_OBJECT_ID_DETAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -79,6 +80,15 @@ class PartnerServiceTest {
         assertThrows(IllegalStateException.class,
                 () -> service.insertIfNotExists(document.toDomain()).block(),
                 String.format(EXISTS_ERROR_MESSAGE, DOCUMENT));
+    }
+
+    @Test
+    void should_throw_exceptions_when_is_an_invalid_id() {
+        var id = "invalidId";
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.findById(id).block(),
+                String.format(INVALID_OBJECT_ID_DETAIL, id));
     }
 
     @Test

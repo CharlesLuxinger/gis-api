@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo 'Import data...'
+echo 'Importing data...'
 
 docker exec mongodb.gis.api sh -c "mongoimport --jsonArray --db gis --collection partners --file data.json"
 

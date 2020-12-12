@@ -1,11 +1,9 @@
 package com.github.charlesluxinger.gisapi.controller;
 
-import com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse;
 import com.github.charlesluxinger.gisapi.controller.model.PartnerPayload;
 import com.github.charlesluxinger.gisapi.controller.model.PartnerResponse;
 import com.github.charlesluxinger.gisapi.domain.service.PartnerService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +17,10 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+import static com.github.charlesluxinger.gisapi.controller.PartnerControllerImpl.PARTNER_PATH;
+import static com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse.buildBadRequestResponse;
+import static com.github.charlesluxinger.gisapi.controller.model.ApiExceptionResponse.buildNotFoundResponse;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
@@ -28,59 +28,53 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @version 1.0.0 07/12/20
  */
 @RestController
-@RequestMapping(produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = PARTNER_PATH, produces = APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 public class PartnerControllerImpl implements PartnerController {
 
     private final PartnerService service;
 
-    private static final String PARTNER_PATH = "api/v1/partner";
+    public static final String PARTNER_PATH = "/partner";
+    public static final String FIND_BY_ID_PATH_LOG = PARTNER_PATH + "/%s";
+    private static final String QUERIES_PARAM = "?long=%f&lat=%f";
+    private static final String PARTNER_NOT_FOUND_DETAIL = "Partner '#%s' Not Found";
     private static final String NOT_FOUND_NEARBY_PARTNER_ERROR = "Not Found nearby Partner at long:%f lat:%f";
     public static final String LONGITUDE = "long";
     public static final String LATITUDE = "lat";
 
     @Override
-    @GetMapping(value = "/partner/{id}")
+    @GetMapping(value = "/{id}")
     public Mono<ResponseEntity> findById(@PathVariable final String id){
         return service
                 .findById(id)
                 .map(p -> ResponseEntity.ok(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
-                .defaultIfEmpty(ResponseEntity
-                                .status(HttpStatus.NOT_FOUND)
-                                .contentType(APPLICATION_JSON)
-                                .body(ApiExceptionResponse
-                                        .builder()
-                                        .status(HttpStatus.NOT_FOUND.value())
-                                        .title(HttpStatus.NOT_FOUND.getReasonPhrase())
-                                        .detail(String.format("Partner '#%s' Not Found", id))
-                                        .path(String.format(PARTNER_PATH +"/%s", id))
-                                        .build()));
+                .defaultIfEmpty(buildNotFoundResponse(String.format(FIND_BY_ID_PATH_LOG, id),
+                                                      String.format(PARTNER_NOT_FOUND_DETAIL, id)))
+                .onErrorResume(err -> {
+                    if (err.getClass() != IllegalArgumentException.class) {
+                        return Mono.error(err);
+                    }
+
+                    return Mono.just(buildBadRequestResponse(String.format(FIND_BY_ID_PATH_LOG, id), err.getLocalizedMessage()));
+                });
     }
 
     @Override
-    @GetMapping(value = "/partner")
+    @GetMapping
     public Mono<ResponseEntity> findNearbyAndCoverageArea(@RequestParam(LONGITUDE) final double longitude,
                                                           @RequestParam(LATITUDE) final double latitude){
         return service
                 .findNearbyAndCoverageArea(longitude, latitude)
                 .map(p -> ResponseEntity.ok(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
-                .defaultIfEmpty(ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .contentType(APPLICATION_JSON)
-                        .body(ApiExceptionResponse
-                                .builder()
-                                .status(HttpStatus.NOT_FOUND.value())
-                                .title(HttpStatus.NOT_FOUND.getReasonPhrase())
-                                .detail(String.format(NOT_FOUND_NEARBY_PARTNER_ERROR, longitude, latitude))
-                                .path(String.format(PARTNER_PATH + "?long=%f&lat=%f", longitude, latitude))
-                                .build()));
+                .defaultIfEmpty(buildNotFoundResponse(String.format(PARTNER_PATH + QUERIES_PARAM, longitude, latitude),
+                                                      String.format(NOT_FOUND_NEARBY_PARTNER_ERROR, longitude, latitude)));
     }
 
     @Override
     @ResponseStatus(CREATED)
-    @PostMapping(value = "/partner", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity> save(@RequestBody final PartnerPayload partners){
         return Mono
                 .just(partners)
@@ -93,16 +87,7 @@ public class PartnerControllerImpl implements PartnerController {
                         return Mono.error(err);
                     }
 
-                    return Mono.just(ResponseEntity
-                            .badRequest()
-                            .contentType(APPLICATION_JSON)
-                            .body(ApiExceptionResponse
-                                    .builder()
-                                    .status(HttpStatus.BAD_REQUEST.value())
-                                    .title(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                                    .detail(err.getLocalizedMessage())
-                                    .path(PARTNER_PATH)
-                                    .build()));
+                    return Mono.just(buildBadRequestResponse(PARTNER_PATH, err.getLocalizedMessage()));
                 });
     }
 
