@@ -4,6 +4,7 @@ import com.github.charlesluxinger.gisapi.domain.model.Partner;
 import com.github.charlesluxinger.gisapi.infra.model.PartnerDocument;
 import com.github.charlesluxinger.gisapi.infra.repository.PartnerRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import static com.github.charlesluxinger.gisapi.infra.config.CacheConfig.CACHE_NAME;
 import static org.bson.types.ObjectId.isValid;
 
 /**
@@ -29,6 +31,7 @@ public class PartnerService {
     protected static final String EXISTS_ERROR_MESSAGE = "Partner with document '#%s' already exists.";
     private final PartnerRepository repository;
 
+    @Cacheable(value = CACHE_NAME, key = "#id")
     public Mono<Partner> findById(@NotBlank final String id) {
         if (isValid(id)) {
             return repository
@@ -47,6 +50,7 @@ public class PartnerService {
 
     }
 
+    @Cacheable(value = CACHE_NAME, keyGenerator = "findNearbyAndCoverageAreaKeyGenerator")
     public Mono<Partner> findNearbyAndCoverageArea(final double longitude, final double latitude) {
         return repository
                 .findNearbyAndCoverageArea(longitude, latitude)

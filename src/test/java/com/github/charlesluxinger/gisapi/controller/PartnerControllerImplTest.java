@@ -235,7 +235,7 @@ class PartnerControllerImplTest {
         var p1 = new Point(0., 1.);
         var p2 = new Point(2., 3.);
         var p3 = new Point(4., 5.);
-        
+
         return PartnerDocument
                 .builder()
                 .id(ID)
