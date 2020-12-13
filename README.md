@@ -1,3 +1,4 @@
+![Continuos Integration](https://github.com/CharlesLuxinger/gis-api/workflows/Continuos%20Integration/badge.svg)
 # GIS API
 Aplicação para gerenciamento de parceiros e indicações com base na coordenadas geográficas do usuário.
 
