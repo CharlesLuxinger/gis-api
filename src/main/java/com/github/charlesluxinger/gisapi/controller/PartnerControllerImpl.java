@@ -2,6 +2,8 @@ package com.github.charlesluxinger.gisapi.controller;
 
 import com.github.charlesluxinger.gisapi.controller.model.request.PartnerRequest;
 import com.github.charlesluxinger.gisapi.controller.model.response.PartnerResponse;
+import com.github.charlesluxinger.gisapi.domain.exceptions.InvalidObjectIdException;
+import com.github.charlesluxinger.gisapi.domain.exceptions.PartnerDocumentDuplicatedException;
 import com.github.charlesluxinger.gisapi.domain.service.PartnerService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +54,7 @@ public class PartnerControllerImpl implements PartnerController {
                 .map(p -> ResponseEntity.ok(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
                 .defaultIfEmpty(buildNotFoundResponse(path, String.format(PARTNER_NOT_FOUND_DETAIL, id)))
-                .onErrorResume(err -> mapError(err, path, IllegalArgumentException.class));
+                .onErrorResume(err -> mapError(err, path, InvalidObjectIdException.class));
     }
 
     @Override
@@ -77,7 +79,7 @@ public class PartnerControllerImpl implements PartnerController {
                 .flatMap(service::insertIfNotExists)
                 .map(p -> ResponseEntity.created(URI.create(PARTNER_PATH)).body(PartnerResponse.of(p)))
                 .cast(ResponseEntity.class)
-                .onErrorResume(err -> mapError(err, PARTNER_PATH, IllegalStateException.class));
+                .onErrorResume(err -> mapError(err, PARTNER_PATH, PartnerDocumentDuplicatedException.class));
     }
 
     private Mono<ResponseEntity> mapError(final Throwable err, final String path , final Class<? extends RuntimeException> clazz) {

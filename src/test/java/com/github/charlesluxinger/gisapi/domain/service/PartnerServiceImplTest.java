@@ -1,5 +1,7 @@
 package com.github.charlesluxinger.gisapi.domain.service;
 
+import com.github.charlesluxinger.gisapi.domain.exceptions.InvalidObjectIdException;
+import com.github.charlesluxinger.gisapi.domain.exceptions.PartnerDocumentDuplicatedException;
 import com.github.charlesluxinger.gisapi.domain.model.Partner;
 import com.github.charlesluxinger.gisapi.infra.model.PartnerDocument;
 import com.github.charlesluxinger.gisapi.infra.repository.PartnerRepository;
@@ -21,8 +23,8 @@ import java.util.List;
 
 import static com.github.charlesluxinger.gisapi.controller.model.response.CoordinateType.MULTI_POLYGON;
 import static com.github.charlesluxinger.gisapi.controller.model.response.CoordinateType.POINT;
-import static com.github.charlesluxinger.gisapi.domain.service.PartnerService.EXISTS_ERROR_MESSAGE;
-import static com.github.charlesluxinger.gisapi.domain.service.PartnerService.INVALID_OBJECT_ID_DETAIL;
+import static com.github.charlesluxinger.gisapi.domain.exceptions.InvalidObjectIdException.INVALID_OBJECT_ID_DETAIL;
+import static com.github.charlesluxinger.gisapi.domain.exceptions.PartnerDocumentDuplicatedException.EXISTS_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -35,9 +37,9 @@ import static org.mockito.Mockito.when;
  * @author Charles Luxinger
  * @version 09/12/20
  */
-@Import(PartnerService.class)
+@Import(PartnerServiceImpl.class)
 @ExtendWith(SpringExtension.class)
-class PartnerServiceTest {
+class PartnerServiceImplTest {
 
     private static final String ID = "5fd003a8e6c31b4012d5f55a";
     private static final String DOCUMENT = "02.546.716/00170";
@@ -77,7 +79,7 @@ class PartnerServiceTest {
 
         when(repository.insert((PartnerDocument) Mockito.any())).thenReturn(Mono.error(new DuplicateKeyException("")));
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(PartnerDocumentDuplicatedException.class,
                 () -> service.insertIfNotExists(document.toDomain()).block(),
                 String.format(EXISTS_ERROR_MESSAGE, DOCUMENT));
     }
@@ -86,7 +88,7 @@ class PartnerServiceTest {
     void should_throw_exceptions_when_is_an_invalid_id() {
         var id = "invalidId";
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidObjectIdException.class,
                 () -> service.findById(id).block(),
                 String.format(INVALID_OBJECT_ID_DETAIL, id));
     }
