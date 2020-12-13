@@ -44,6 +44,31 @@ ___
     ```shell
     $ curl -X POST 'http://localhost:9000/api/v1/partner' -d '{"ownerName": "João Pé de Porco", "document": "321.132.312/000230", "tradingName": "O Boteco da Esquina",  "coverageArea": {"type": "MultiPolygon", "coordinates": [[[[-43.36556, -22.99669], [-43.36539, -23.01928 ], [-46.62135, -23.61440], [-43.36556, -22.99669]]]]}, "address": {"type": "Point", "coordinates": [-43.297337, -23.013538]}}' -H 'Content-type: application/json'
     ```
+  Body:
+    ```json
+  {
+        "ownerName": "João Pé de Porco",
+        "document": "321.132.312/000230",
+        "tradingName": "O Boteco da Esquina",
+        "coverageArea": {
+            "type": "MultiPolygon",
+            "coordinates": [
+                [
+                    [
+                        [-43.36556, -22.99669],
+                        [-43.36539, -23.01928],
+                        [-46.62135, -23.61440],
+                        [-43.36556, -22.99669]
+                    ]
+                ]
+            ]
+        },
+        "address": {
+            "type": "Point",
+            "coordinates": [-43.297337, -23.013538]
+        }
+  }
+    ```
   Response:
     ```json
   {
@@ -131,7 +156,7 @@ ___
   }
     ```
 ---
-## Teste unitários:
+## Testes
 - Acesse a raiz do projeto através do terminal:
     ```shell
     $ mvn clean test -U
