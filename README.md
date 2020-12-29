@@ -95,7 +95,7 @@ ___
         }
   }
     ```
-- Busca parceiro por ID:
+- Busca parceiro por ID(Se faz necessário inserir o ID no parâmetro do path `{ID}` corresponde na URL abaixo):
     ```shell
     $ curl -X GET 'http://localhost:9000/api/v1/partner/{id}' -H 'Accept: application/json'
     ```

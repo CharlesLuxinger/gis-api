@@ -136,9 +136,8 @@ class PartnerControllerImplTest {
     void should_return_status_200_when_find_by_longitude_and_latitude() {
         template.indexOps(PARTNERS_COLLECTION_NAME)
                 .ensureIndex(new GeospatialIndex(ADDRESS + COORDINATES).typed(GEO_2DSPHERE))
+                .flatMap($ -> repository.insert(buildPartnerDocument()))
                 .block();
-
-        repository.insert(buildPartnerDocument()).block();
 
         given()
             .queryParam(LONGITUDE, 0.)

@@ -49,7 +49,6 @@ public class PartnerServiceImpl implements PartnerService {
                 .insert(PartnerDocument.of(partners))
                 .map(PartnerDocument::toDomain)
                 .onErrorMap(e -> errorMap(partners, e));
-
     }
 
     @Override
@@ -60,7 +59,7 @@ public class PartnerServiceImpl implements PartnerService {
                 .map(PartnerDocument::toDomain);
     }
 
-    private Throwable errorMap(Partner partners, Throwable err) {
+    private Throwable errorMap(final Partner partners, final Throwable err) {
         return err.getClass().equals(DuplicateKeyException.class) ?
                 new PartnerDocumentDuplicatedException(partners.getDocument()) :
                 err;

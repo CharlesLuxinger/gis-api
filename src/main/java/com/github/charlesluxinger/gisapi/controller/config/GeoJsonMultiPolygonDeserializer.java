@@ -9,7 +9,10 @@ import org.springframework.data.mongodb.core.geo.GeoJsonMultiPolygon;
 import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Charles Luxinger
@@ -27,31 +30,37 @@ public class GeoJsonMultiPolygonDeserializer extends StdDeserializer<GeoJsonMult
 
     @Override
     public GeoJsonMultiPolygon deserialize(final JsonParser parser, final DeserializationContext ctxt) throws IOException {
-        JsonNode node = parser.getCodec().readTree(parser);
-        JsonNode coordinates = node.get("coordinates");
-
-        return createMultiPolygon(coordinates);
+        return createMultiPolygon((JsonNode) parser.getCodec().readTree(parser).get("coordinates"));
     }
 
     private GeoJsonMultiPolygon createMultiPolygon(final JsonNode coordinates) {
-        var polygons = new ArrayList<GeoJsonPolygon>();
-
-        if (coordinates.isArray()) {
-            for (JsonNode polygon : coordinates) {
-                if (polygon.isArray()) {
-                    for (JsonNode points : polygon) {
-                        if (points.isArray()) {
-                            var pointsList = new ArrayList<Point>();
-                            for (JsonNode eachPoint : points) {
-                                pointsList.add(new Point(eachPoint.get(0).asDouble(), eachPoint.get(1).asDouble()));
-                            }
-                            polygons.add(new GeoJsonPolygon(pointsList));
-                        }
-                    }
-                }
-            }
+        if (isNotArray(coordinates)) {
+            return new GeoJsonMultiPolygon(Collections.emptyList());
         }
 
-        return new GeoJsonMultiPolygon(polygons);
+        return new GeoJsonMultiPolygon(extractCoordinates(coordinates));
     }
+
+    private List<GeoJsonPolygon> extractCoordinates(final JsonNode coordinates) {
+        return Arrays
+            .stream(new JsonNode[]{coordinates})
+            .filter(this::isNotArray)
+            .map(this::createJsonPolygon)
+            .collect(Collectors.toList());
+    }
+
+    private GeoJsonPolygon createJsonPolygon(final JsonNode polygon) {
+        var pointsList = Arrays
+                .stream(new JsonNode[]{polygon})
+                .filter(this::isNotArray)
+                .map(p -> new Point(p.get(0).asDouble(), p.get(1).asDouble()))
+                .collect(Collectors.toList());
+
+        return new GeoJsonPolygon(pointsList);
+    }
+
+    private boolean isNotArray(final JsonNode node) {
+        return !node.isArray();
+    }
+
 }

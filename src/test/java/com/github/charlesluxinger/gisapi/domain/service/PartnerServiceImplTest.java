@@ -54,8 +54,7 @@ class PartnerServiceImplTest {
 
     @Test
     void should_return_a_partner_when_find_by_id() {
-        var document = buildPartnerDocument(ID);
-        when(repository.findById(ID)).thenReturn(Mono.just(document));
+        when(repository.findById(ID)).thenReturn(Mono.just(buildPartnerDocument(ID)));
 
         var partner = service.findById(ID).block();
 
@@ -75,12 +74,10 @@ class PartnerServiceImplTest {
 
     @Test
     void should_throw_exceptions_when_insert_an_exists_document() {
-        var document = buildPartnerDocument(ID);
-
         when(repository.insert((PartnerDocument) Mockito.any())).thenReturn(Mono.error(new DuplicateKeyException("")));
 
         assertThrows(PartnerDocumentDuplicatedException.class,
-                () -> service.insertIfNotExists(document.toDomain()).block(),
+                () -> service.insertIfNotExists(buildPartnerDocument(ID).toDomain()).block(),
                 String.format(EXISTS_ERROR_MESSAGE, DOCUMENT));
     }
 
@@ -97,9 +94,8 @@ class PartnerServiceImplTest {
     void should_return_a_nearby_partner_when_find_by_a_valid_longitude_and_latitude() {
         var longitude = 0;
         var latitude = 1;
-        var document = buildPartnerDocument(ID);
 
-        when(repository.findNearbyAndCoverageArea(longitude, latitude)).thenReturn(Mono.just(document));
+        when(repository.findNearbyAndCoverageArea(longitude, latitude)).thenReturn(Mono.just(buildPartnerDocument(ID)));
 
         var partner = service.findNearbyAndCoverageArea(longitude, latitude).block();
 
@@ -110,7 +106,6 @@ class PartnerServiceImplTest {
     void should_not_return_a_nearby_partner_when_find_by_an_invalida_longitude_and_latitude() {
         var longitude = 0.;
         var latitude = 1.;
-        var document = buildPartnerDocument(ID);
 
         when(repository.findNearbyAndCoverageArea(longitude, latitude)).thenReturn(Mono.empty());
 
